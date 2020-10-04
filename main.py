@@ -16,15 +16,14 @@ class Dice:
         return self.roll_amt
 
     def RollStats(self):
-        return 'Current statistics for dice object {} are {}'.format(id(self), Counter(self.roll_list))
+        print('Current statistics for dice object {} are {}'.format(hex(id(self)), Counter(self.roll_list)))
 
 
     def Roll(self):
         """generates a new dice for the dice class"""
-        dice = (1, 2, 3, 4, 5, 6)
-        result = (random.choices(dice))
+        result = random.choices((1, 2, 3, 4, 5, 6))
         self.roll_amt+=1
-        self.roll_list.append(result)
+        self.roll_list.append(result[0])
         print('Dice result is {}'.format(result))
         return result
 
@@ -45,3 +44,4 @@ class Game:
 
 
     def gamePlay(self, playerlist):
+        pass
