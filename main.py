@@ -5,7 +5,7 @@ import random
 
 
 class CustomErrorExceptions:
-    def ErrorPlayerIntInvalid(self):
+    class ErrorPlayerIntInvalid(ValueError):
         pass
 
 
@@ -61,7 +61,7 @@ class Game:
     # TODO: Need to make main loop to purge any invalid player_amount entries before new game
     def newGame(self):
         if self.player_amount < 2 or self.player_amount > 10:
-            raise CustomErrorExceptions.ErrorPlayerIntInvalid()
+            raise CustomErrorExceptions.ErrorPlayerIntInvalid
         for player in range(0, self.player_amount):
             name = input('Please put in name for Player {}:'.format(player + 1))
             newplayer = Player(player_name=name, player_id=player)
