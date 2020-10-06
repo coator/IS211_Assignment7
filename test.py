@@ -21,7 +21,7 @@ class TestGame(unittest.TestCase):
         self.assertRaises(main.CustomErrorExceptions.ErrorPlayerIntInvalid,g.newGame)
 
     def test_game_run(self):
-
+        pass
 
 
 

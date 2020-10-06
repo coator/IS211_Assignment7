@@ -28,17 +28,17 @@ class Dice:
         self.roll_amt += 1
         self.roll_list.append(result[0])
         print('Dice result is {}'.format(result))
-        return result
+        return result[0]
 
 
 class Player:
-    def __init__(self, player_name, player_id):
-        self.player_name = player_name
-        self.player_id = player_id
-        self.player_score = 0
+    def __init__(self, pname, pid, score=0):
+        self.name = pname
+        self.id = pid
+        self.score = score
 
     def AddScore(self, score_addon):
-        self.player_score = self.player_score + score_addon
+        self.score = self.score + score_addon
 
 
 """
@@ -56,44 +56,59 @@ class Game:
         """create a game instance"""
         self.player_amount = player_amount
         self.pl = []
-        self.dice = Dice
 
     # TODO: Need to make main loop to purge any invalid player_amount entries before new game
     def newGame(self):
         if self.player_amount < 2 or self.player_amount > 10:
             raise CustomErrorExceptions.ErrorPlayerIntInvalid
         for player in range(0, self.player_amount):
-            name = input('Please put in name for Player {}:'.format(player + 1))
-            newplayer = Player(player_name=name, player_id=player)
-            self.pl.append(newplayer)
+            name = input('Please put in name for Player {}: '.format(player + 1))
+            self.pl.append(Player(pname=name, pid=player))
+
+    def gamePlay(self):
+        victory = False
+        while not victory:
+            for player in range(0, self.player_amount):
+                self.gameRound(self.pl[player])
+                print('next player')
 
     def gameRound(self, activeplayer):
+        print(activeplayer)
         rollcount, scorecount, turn_end = 0, 0, False
         while turn_end is False:
-            result = self.dice.Roll
+            dice = Dice()
+            result = dice.Roll()
             if result == 1:
-                turn_end = True
+                return
             else:
                 scorecount += result
                 rollcount += 1
                 while not turn_end:
-                    player_choice = input('Please choose "r" to roll or "h" to hold and end your turn')
-                    if player_choice != 'h' or player_choice != 'r':
-                        print('Invalid input, please try again')
-                    elif player_choice == 'h':
+                    player_choice = input(
+                        'Player {} Please choose "r" to roll or "h" to hold and end your turn '.format(
+                            activeplayer.name))
+                    if player_choice == 'h':
                         activeplayer.AddScore(scorecount)
-                        turn_end = True
-                    elif player_choice == 'r':
-                        result = self.dice.Roll
+                        print('{} ends their turn with {} points.'.format(activeplayer.name,
+                                                                          activeplayer.score))
+                        return
+                    if player_choice == 'r':
+                        result = dice.Roll()
                         if result == 1:
-                            turn_end = True
+                            return
                         else:
                             scorecount += result
                             rollcount += 1
+                    else:
+                        'Player {} Invalid selection, please try again '.format(activeplayer.name)
+        return
 
-    def gamePlay(self):
-        victory = False
-        possible_choice = ('r', 'h')
-        while not victory:
-            for player in range(0, self.player_amount):
-                self.gameRound(self.pl[player])
+
+def main():
+    players = int(input('how many players between 2 and 10 '))
+    current = Game(player_amount=players)
+    current.newGame()
+    current.gamePlay()
+
+
+main()
