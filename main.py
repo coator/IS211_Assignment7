@@ -1,6 +1,6 @@
 """Pig game"""
 
-from collections import Counter
+import argparse
 import random
 
 
@@ -43,14 +43,14 @@ class Game:
         """create a game instance"""
         self.player_amount = player_amount
         self.pl = []
-        self.turn_count = 0
+        self.turn_count = 1
         self.dice_count = 0
+        self.random_seed = 0
 
     def game_state_tracker(self, dice_counter=0, turn_counter=0):
         self.turn_count += turn_counter
-        print(self.turn_count)
         self.dice_count += dice_counter
-        print(self.dice_count)
+        print("turn count is {} ||| dice counter is {}".format(self.turn_count, self.dice_count))
 
     def newGame(self):
         if self.player_amount < 2 or self.player_amount > 10:
@@ -103,8 +103,15 @@ class Game:
         return
 
 
+def argparser():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--playerint", default=2, help="Enter the amount of players in the game",type=int)
+    args = parser.parse_args()
+    return args.playerint
+
+
 def main():
-    players = int(input('how many players between 2 and 10 '))
+    players = argparser()
     current = Game(player_amount=players)
     current.newGame()
     current.gamePlay()
