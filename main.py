@@ -13,6 +13,7 @@ class Dice:
     def __init__(self):
         self.roll_amt = 0
         self.roll_list = []
+        self.dice_seed_list = []
         # self.rolllist is literally declaring that the item is = what the user puts in. why did it take me so long
         # to figure that out
 
@@ -23,10 +24,10 @@ class Dice:
         """generates a new dice for the dice class"""
         result = random.choices((1, 2, 3, 4, 5, 6))
         self.roll_amt += 1
+        self.dice_seed_list.append(random.seed(self.roll_amt))
         self.roll_list.append(result[0])
         print('Dice result is {}'.format(result))
         return result[0]
-
 
 class Player:
     def __init__(self, pname, pid, score=0):
@@ -63,7 +64,7 @@ class Game:
             for player in range(0, self.player_amount):
                 current_player = self.pl[player]
                 if current_player.score > 99:
-                    print("{} has won with a score of {}")
+                    print("{} has won with a score of {}".format(current_player.name,current_player.score))
                     return
                 else:
                     self.gameRound(current_player)
@@ -71,21 +72,24 @@ class Game:
                     print('next player')
 
     def gameRound(self, current_player):
-        print("_____________________________________________________________________")
-        print("Player {}, it is your turn. You currently have {} points.".format(current_player.name,
-                                                                                 current_player.score))
         scorecount, turn_end = 0, False
+        print("_____________________________________________________________________")
         dice = Dice()
         while turn_end is False:
             self.game_state_tracker(1, 0)
             result = dice.Roll()
             if result == 1:
+                print("Player {},You rolled a 0 and your turn is over".format(current_player.name))
                 return
             else:
                 scorecount += result
                 while not turn_end:
+                    print(
+                        "Player {}, it is your turn. Your score is {} points. You currently have a possible score of {}".format(
+                            current_player.name,
+                            current_player.score, scorecount))
                     player_choice = input(
-                        'Please choose "r" to roll or "h" to hold and end your turn '.format(current_player.name))
+                        'Please choose "r" to roll or "h" to hold and end your turn: '.format(current_player.name))
                     if player_choice == 'h':
                         current_player.AddScore(scorecount)
                         print('{} ends their turn with {} points.'.format(current_player.name,
@@ -95,6 +99,7 @@ class Game:
                         self.game_state_tracker(1, 0)
                         result = dice.Roll()
                         if result == 1:
+                            print("Player {},You rolled a 0 and your turn is over".format(current_player.name))r
                             return
                         else:
                             scorecount += result
