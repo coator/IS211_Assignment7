@@ -19,9 +19,6 @@ class Dice:
     def __repr__(self):
         return self.roll_amt
 
-    def RollStats(self):
-        print('Current statistics for dice object {} are {}'.format(hex(id(self)), Counter(self.roll_list)))
-
     def Roll(self):
         """generates a new dice for the dice class"""
         result = random.choices((1, 2, 3, 4, 5, 6))
@@ -41,56 +38,51 @@ class Player:
         self.score = self.score + score_addon
 
 
-"""
-while True:
-    player_amount = input('Please put in amount of players between 2 and 10')
-    try:
-        player_amount = int(player_amount)
-    except:
-        print('Invalid type used, must be a integer between 2 and 10.')
-"""
-
-
 class Game:
     def __init__(self, turn_count=0, player_amount=2):
         """create a game instance"""
         self.player_amount = player_amount
         self.pl = []
-        self.turn_count = turn_count
+        self.turn_count = 0
+        self.dice_count = 0
 
-    # TODO: Need to make main loop to purge any invalid player_amount entries before new game
+    def game_state_tracker(self, dice_counter=0, turn_counter=0):
+        self.turn_count += turn_counter
+        print(self.turn_count)
+        self.dice_count += dice_counter
+        print(self.dice_count)
+
     def newGame(self):
         if self.player_amount < 2 or self.player_amount > 10:
             raise CustomErrorExceptions.ErrorPlayerIntInvalid
         for player in range(0, self.player_amount):
-            name = input('Please put in name for Player {}: '.format(player + 1))
-            self.pl.append(Player(pname=name, pid=player))
+            self.pl.append(Player(pname=player + 1, pid=player))
 
     def gamePlay(self):
-        victory = False
-        while not victory:
+        while True:
             for player in range(0, self.player_amount):
                 current_player = self.pl[player]
                 if current_player.score > 99:
                     print("{} has won with a score of {}")
-                    victory = True
                     return
                 else:
                     self.gameRound(current_player)
-                    self.turn_count += 1
+                    self.game_state_tracker(0, 1)
                     print('next player')
 
     def gameRound(self, current_player):
-        print("{}, it is your turn. You currently have {} points.".format(current_player.name, current_player.score))
-        rollcount, scorecount, turn_end = 0, 0, False
+        print("_____________________________________________________________________")
+        print("Player {}, it is your turn. You currently have {} points.".format(current_player.name,
+                                                                                 current_player.score))
+        scorecount, turn_end = 0, False
+        dice = Dice()
         while turn_end is False:
-            dice = Dice()
+            self.game_state_tracker(1, 0)
             result = dice.Roll()
             if result == 1:
                 return
             else:
                 scorecount += result
-                rollcount += 1
                 while not turn_end:
                     player_choice = input(
                         'Please choose "r" to roll or "h" to hold and end your turn '.format(current_player.name))
@@ -100,12 +92,12 @@ class Game:
                                                                           current_player.score))
                         return
                     if player_choice == 'r':
+                        self.game_state_tracker(1, 0)
                         result = dice.Roll()
                         if result == 1:
                             return
                         else:
                             scorecount += result
-                            rollcount += 1
                     else:
                         'Player {} Invalid selection, please try again '.format(current_player.name)
         return
