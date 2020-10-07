@@ -52,10 +52,11 @@ while True:
 
 
 class Game:
-    def __init__(self, player_amount=2):
+    def __init__(self, turn_count=0, player_amount=2):
         """create a game instance"""
         self.player_amount = player_amount
         self.pl = []
+        self.turn_count = turn_count
 
     # TODO: Need to make main loop to purge any invalid player_amount entries before new game
     def newGame(self):
@@ -69,11 +70,18 @@ class Game:
         victory = False
         while not victory:
             for player in range(0, self.player_amount):
-                self.gameRound(self.pl[player])
-                print('next player')
+                current_player = self.pl[player]
+                if current_player.score > 99:
+                    print("{} has won with a score of {}")
+                    victory = True
+                    return
+                else:
+                    self.gameRound(current_player)
+                    self.turn_count += 1
+                    print('next player')
 
-    def gameRound(self, activeplayer):
-        print(activeplayer)
+    def gameRound(self, current_player):
+        print("{}, it is your turn. You currently have {} points.".format(current_player.name, current_player.score))
         rollcount, scorecount, turn_end = 0, 0, False
         while turn_end is False:
             dice = Dice()
@@ -85,12 +93,11 @@ class Game:
                 rollcount += 1
                 while not turn_end:
                     player_choice = input(
-                        'Player {} Please choose "r" to roll or "h" to hold and end your turn '.format(
-                            activeplayer.name))
+                        'Please choose "r" to roll or "h" to hold and end your turn '.format(current_player.name))
                     if player_choice == 'h':
-                        activeplayer.AddScore(scorecount)
-                        print('{} ends their turn with {} points.'.format(activeplayer.name,
-                                                                          activeplayer.score))
+                        current_player.AddScore(scorecount)
+                        print('{} ends their turn with {} points.'.format(current_player.name,
+                                                                          current_player.score))
                         return
                     if player_choice == 'r':
                         result = dice.Roll()
@@ -100,7 +107,7 @@ class Game:
                             scorecount += result
                             rollcount += 1
                     else:
-                        'Player {} Invalid selection, please try again '.format(activeplayer.name)
+                        'Player {} Invalid selection, please try again '.format(current_player.name)
         return
 
 
