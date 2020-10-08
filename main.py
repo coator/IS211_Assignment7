@@ -14,8 +14,6 @@ class Dice:
         self.roll_amt = 0
         self.roll_list = []
         self.dice_seed_list = []
-        # self.rolllist is literally declaring that the item is = what the user puts in. why did it take me so long
-        # to figure that out
 
     def __repr__(self):
         return self.roll_amt
@@ -24,10 +22,10 @@ class Dice:
         """generates a new dice for the dice class"""
         result = random.choices((1, 2, 3, 4, 5, 6))
         self.roll_amt += 1
-        self.dice_seed_list.append(random.seed(self.roll_amt))
         self.roll_list.append(result[0])
         print('Dice result is {}'.format(result))
         return result[0]
+
 
 class Player:
     def __init__(self, pname, pid, score=0):
@@ -39,8 +37,13 @@ class Player:
         self.score = self.score + score_addon
 
 
+def victory_check(current_player, result):
+    if current_player.score + result > 99:
+        print("Player {} has won with a score of {}".format(current_player.name, result + current_player.score))
+        game_over()
+
 class Game:
-    def __init__(self, turn_count=0, player_amount=2):
+    def __init__(self, player_amount=2):
         """create a game instance"""
         self.player_amount = player_amount
         self.pl = []
@@ -51,7 +54,6 @@ class Game:
     def game_state_tracker(self, dice_counter=0, turn_counter=0):
         self.turn_count += turn_counter
         self.dice_count += dice_counter
-        print("turn count is {} ||| dice counter is {}".format(self.turn_count, self.dice_count))
 
     def newGame(self):
         if self.player_amount < 2 or self.player_amount > 10:
@@ -63,17 +65,14 @@ class Game:
         while True:
             for player in range(0, self.player_amount):
                 current_player = self.pl[player]
-                if current_player.score > 99:
-                    print("{} has won with a score of {}".format(current_player.name,current_player.score))
-                    return
-                else:
-                    self.gameRound(current_player)
-                    self.game_state_tracker(0, 1)
-                    print('next player')
+                print("_____________________________")
+                print("|Now it is player {}'s turn  |".format(current_player.name))
+                print("_____________________________")
+                victory_check(current_player, result=0)
+                self.gameRound(current_player)
 
     def gameRound(self, current_player):
-        scorecount, turn_end = 0, False
-        print("_____________________________________________________________________")
+        score_count, turn_end = 0, False
         dice = Dice()
         while turn_end is False:
             self.game_state_tracker(1, 0)
@@ -82,37 +81,46 @@ class Game:
                 print("Player {},You rolled a 0 and your turn is over".format(current_player.name))
                 return
             else:
-                scorecount += result
-                while not turn_end:
-                    print(
-                        "Player {}, it is your turn. Your score is {} points. You currently have a possible score of {}".format(
-                            current_player.name,
-                            current_player.score, scorecount))
+                score_count += result
+                victory_check(current_player, result=score_count)
+                print(
+                    "Player {}, it is your turn. Your score is {} points. You currently have a possible score of"
+                    " {}".format(
+                        current_player.name,
+                        current_player.score, current_player.score + score_count))
+                player_choice = None
+                while player_choice is None:
                     player_choice = input(
                         'Please choose "r" to roll or "h" to hold and end your turn: '.format(current_player.name))
                     if player_choice == 'h':
-                        current_player.AddScore(scorecount)
+                        current_player.AddScore(score_count)
                         print('{} ends their turn with {} points.'.format(current_player.name,
                                                                           current_player.score))
                         return
                     if player_choice == 'r':
-                        self.game_state_tracker(1, 0)
-                        result = dice.Roll()
-                        if result == 1:
-                            print("Player {},You rolled a 0 and your turn is over".format(current_player.name))r
-                            return
-                        else:
-                            scorecount += result
+                        continue
                     else:
-                        'Player {} Invalid selection, please try again '.format(current_player.name)
-        return
+                        player_choice = None
 
 
 def argparser():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--playerint", default=2, help="Enter the amount of players in the game",type=int)
+    parser.add_argument("--playerint", default=2, help="Enter the amount of players in the game", type=int)
     args = parser.parse_args()
     return args.playerint
+
+
+
+def game_over():
+    while True:
+        decision = input("play again? (y or n) :")
+        if decision == 'y':
+            main()
+        if decision == 'n':
+            print("goodbye!")
+            exit()
+        else:
+            pass
 
 
 def main():
