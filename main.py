@@ -42,6 +42,7 @@ def victory_check(current_player, result):
         print("Player {} has won with a score of {}".format(current_player.name, result + current_player.score))
         game_over()
 
+
 class Game:
     def __init__(self, player_amount=2):
         """create a game instance"""
@@ -108,7 +109,6 @@ def argparser():
     parser.add_argument("--playerint", default=2, help="Enter the amount of players in the game", type=int)
     args = parser.parse_args()
     return args.playerint
-
 
 
 def game_over():
